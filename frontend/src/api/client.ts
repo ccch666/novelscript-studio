@@ -17,6 +17,18 @@ export type GenerateScriptResponse = {
   yaml_text: string
   model: string
   chapter_analysis: ChapterAnalysis
+  validation: ValidationResponse
+  repair_rounds: number
+}
+
+export type ValidationIssue = {
+  path: string
+  message: string
+}
+
+export type ValidationResponse = {
+  passed: boolean
+  errors: ValidationIssue[]
 }
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:8000'
@@ -45,6 +57,23 @@ export async function generateScript(novelText: string, style = 'film'): Promise
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({ novel_text: novelText, style }),
+  })
+
+  if (!response.ok) {
+    const detail = await response.json().catch(() => null)
+    throw new Error(detail?.detail || `HTTP ${response.status}`)
+  }
+
+  return response.json()
+}
+
+export async function validateScript(yamlText: string): Promise<ValidationResponse> {
+  const response = await fetch(`${API_BASE_URL}/api/scripts/validate`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ yaml_text: yamlText }),
   })
 
   if (!response.ok) {

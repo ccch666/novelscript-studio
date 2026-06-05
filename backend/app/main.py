@@ -7,10 +7,16 @@ from app.models import (
     ChapterAnalysisResponse,
     GenerateScriptRequest,
     GenerateScriptResponse,
+    RepairScriptRequest,
+    RepairScriptResponse,
+    ValidateScriptRequest,
+    ValidationResponse,
 )
 from app.services.chapter_parser import analyze_novel_chapters
 from app.services.llm_client import LLMConfigurationError, LLMRequestError
 from app.services.screenplay_generator import generate_screenplay_yaml
+from app.services.yaml_repairer import repair_yaml_until_valid
+from app.services.yaml_validator import validate_screenplay_yaml
 from app.settings import get_settings
 
 
@@ -45,7 +51,7 @@ async def health_check() -> HealthResponse:
         status="ok",
         service="novelscript-studio-api",
         version="0.1.0",
-        stage="ai-generation",
+        stage="schema-validation",
     )
 
 
@@ -62,6 +68,10 @@ async def generate_script(request: GenerateScriptRequest) -> GenerateScriptRespo
             style=request.style,
             settings=get_settings(),
         )
+        yaml_text, validation, repair_rounds, model = await repair_yaml_until_valid(
+            yaml_text=yaml_text,
+            settings=get_settings(),
+        )
     except ValueError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
     except LLMConfigurationError as exc:
@@ -73,4 +83,31 @@ async def generate_script(request: GenerateScriptRequest) -> GenerateScriptRespo
         yaml_text=yaml_text,
         model=model,
         chapter_analysis=chapter_analysis,
+        validation=validation,
+        repair_rounds=repair_rounds,
+    )
+
+
+@app.post("/api/scripts/validate", response_model=ValidationResponse)
+async def validate_script(request: ValidateScriptRequest) -> ValidationResponse:
+    return validate_screenplay_yaml(request.yaml_text)
+
+
+@app.post("/api/scripts/repair", response_model=RepairScriptResponse)
+async def repair_script(request: RepairScriptRequest) -> RepairScriptResponse:
+    try:
+        yaml_text, validation, repair_rounds, model = await repair_yaml_until_valid(
+            yaml_text=request.yaml_text,
+            settings=get_settings(),
+        )
+    except LLMConfigurationError as exc:
+        raise HTTPException(status_code=503, detail=str(exc)) from exc
+    except LLMRequestError as exc:
+        raise HTTPException(status_code=502, detail=str(exc)) from exc
+
+    return RepairScriptResponse(
+        yaml_text=yaml_text,
+        model=model,
+        validation=validation,
+        repair_rounds=repair_rounds,
     )
