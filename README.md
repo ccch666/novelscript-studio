@@ -57,6 +57,18 @@ AI：
 - YAML Schema 文档：`docs/yaml-schema.md`，开发阶段 2 添加
 - Demo 视频脚本：`docs/demo-script.md`，开发阶段 9 添加
 
+## 项目结构
+
+```text
+.
+├── backend/          # FastAPI 后端
+├── frontend/         # React + Vite 前端
+├── docs/             # Schema 文档和 demo 脚本
+├── schema/           # YAML Schema
+├── samples/          # 示例小说和示例输出
+└── README.md
+```
+
 ## 开发计划
 
 本项目按 72 小时限时实战节奏推进：
@@ -75,7 +87,35 @@ AI：
 
 ## 启动方式
 
-项目工程骨架将在阶段 1 添加。届时 README 会补充完整的前端和后端启动命令。
+### 后端
+
+```bash
+cd backend
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+uvicorn app.main:app --reload --port 8000
+```
+
+健康检查：
+
+```bash
+curl http://localhost:8000/api/health
+```
+
+### 前端
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+默认访问地址：
+
+```text
+http://localhost:5173
+```
 
 ## Demo 视频
 
