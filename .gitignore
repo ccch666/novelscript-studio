@@ -1,0 +1,48 @@
+# System
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/
+
+# Environment
+.env
+.env.*
+!.env.example
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.venv/
+venv/
+env/
+dist/
+build/
+*.egg-info/
+
+# Node
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+.vite/
+
+# Frontend build
+frontend/dist/
+frontend/.vite/
+
+# Backend runtime
+backend/.pytest_cache/
+backend/__pycache__/
+
+# Generated artifacts
+*.log
+*.tmp
+*.bak
+
