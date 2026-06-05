@@ -2,6 +2,9 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
+from app.models import ChapterAnalysisRequest, ChapterAnalysisResponse
+from app.services.chapter_parser import analyze_novel_chapters
+
 
 class HealthResponse(BaseModel):
     status: str
@@ -34,6 +37,10 @@ async def health_check() -> HealthResponse:
         status="ok",
         service="novelscript-studio-api",
         version="0.1.0",
-        stage="project-scaffold",
+        stage="chapter-analysis",
     )
 
+
+@app.post("/api/chapters/analyze", response_model=ChapterAnalysisResponse)
+async def analyze_chapters(request: ChapterAnalysisRequest) -> ChapterAnalysisResponse:
+    return analyze_novel_chapters(request.novel_text)
