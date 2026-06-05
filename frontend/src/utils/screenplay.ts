@@ -33,6 +33,14 @@ export type ScreenplayDocument = {
   metadata?: {
     title?: string
   }
+  adaptation_report?: {
+    scene_count?: number
+    character_count?: number
+    dialogue_count?: number
+    action_count?: number
+    validation_status?: string
+    repair_rounds?: number
+  }
   characters?: ScriptCharacter[]
   locations?: ScriptLocation[]
   scenes?: ScriptScene[]
@@ -63,4 +71,19 @@ export function getExportFilename(document: ScreenplayDocument | null): string {
   const title = document?.metadata?.title?.trim() || 'screenplay'
   const safeTitle = title.replace(/[\\/:*?"<>|\s]+/g, '-').replace(/^-+|-+$/g, '')
   return `${safeTitle || 'screenplay'}.yaml`
+}
+
+export function buildAdaptationMetrics(document: ScreenplayDocument | null) {
+  const scenes = document?.scenes ?? []
+  const beats = scenes.flatMap((scene) => scene.beats ?? [])
+  const report = document?.adaptation_report
+
+  return {
+    sceneCount: report?.scene_count ?? scenes.length,
+    characterCount: report?.character_count ?? document?.characters?.length ?? 0,
+    dialogueCount: report?.dialogue_count ?? beats.filter((beat) => beat.type === 'dialogue').length,
+    actionCount: report?.action_count ?? beats.filter((beat) => beat.type === 'action').length,
+    validationStatus: report?.validation_status ?? 'unknown',
+    repairRounds: report?.repair_rounds ?? 0,
+  }
 }
