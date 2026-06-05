@@ -1,0 +1,151 @@
+metadata:
+  title: "雨夜来信"
+  version: "1.0"
+  format: "screenplay_yaml"
+  generated_at: "2026-06-05T10:00:00+08:00"
+  style: "film"
+source:
+  title: "雨夜来信"
+  chapter_count: 3
+  language: "zh-CN"
+  chapters:
+    - id: "chapter_001"
+      title: "第一章 雨夜"
+      word_count: 1280
+      summary: "林舟在雨夜收到一封没有署名的旧信，信中提到三年前的事故并非意外。"
+      key_events:
+        - "林舟收到匿名信。"
+        - "信中出现三年前事故的线索。"
+    - id: "chapter_002"
+      title: "第二章 咖啡馆"
+      word_count: 1420
+      summary: "林舟来到旧咖啡馆，与旧友许曼重逢，并发现她也收到过相同符号的信件。"
+      key_events:
+        - "林舟与许曼重逢。"
+        - "许曼展示相同符号。"
+    - id: "chapter_003"
+      title: "第三章 旧档案"
+      word_count: 1510
+      summary: "两人进入废弃档案室，找到事故记录中的缺页，意识到有人刻意隐瞒真相。"
+      key_events:
+        - "两人找到缺页档案。"
+        - "真相被人为隐藏。"
+characters:
+  - id: "char_001"
+    name: "林舟"
+    aliases:
+      - "林先生"
+    role: "protagonist"
+    description: "年轻工程师，三年前事故的幸存者。"
+    motivation: "查清三年前事故的真相。"
+    relationships:
+      - target: "char_002"
+        relation: "旧友"
+  - id: "char_002"
+    name: "许曼"
+    aliases: []
+    role: "supporting"
+    description: "独立调查记者，掌握部分事故线索。"
+    motivation: "证明事故背后存在人为隐瞒。"
+    relationships:
+      - target: "char_001"
+        relation: "旧友"
+locations:
+  - id: "loc_001"
+    name: "林舟公寓"
+    description: "林舟独居的公寓，故事从这里开始。"
+    visual_notes: "窗外暴雨，室内只有书桌灯。"
+  - id: "loc_002"
+    name: "旧咖啡馆"
+    description: "林舟与许曼重逢的地点。"
+    visual_notes: "木质桌椅，墙上挂着停摆的钟。"
+  - id: "loc_003"
+    name: "废弃档案室"
+    description: "保存旧事故资料的地方。"
+    visual_notes: "铁柜、灰尘、闪烁的顶灯。"
+scenes:
+  - id: "scene_001"
+    title: "匿名来信"
+    chapter_refs:
+      - "chapter_001"
+    source_excerpt: "雨水敲在窗上，林舟拆开那封没有署名的信。"
+    location_id: "loc_001"
+    time_of_day: "night"
+    characters:
+      - "char_001"
+    summary: "林舟收到匿名信，发现三年前事故可能另有隐情。"
+    conflict: "林舟想忘记过去，但信件迫使他重新面对事故。"
+    beats:
+      - type: "action"
+        content: "林舟关掉电脑，听见门缝下传来纸张摩擦声。"
+      - type: "action"
+        content: "他捡起信封，看到封口处画着一个黑色圆环。"
+      - type: "dialogue"
+        speaker: "char_001"
+        content: "这不可能，那个标记已经消失三年了。"
+    adaptation_notes:
+      compression: "压缩了原文中大段回忆，用信件和符号直接制造悬念。"
+      rationale: "将心理描写转化为可表演的动作和视觉线索。"
+  - id: "scene_002"
+    title: "旧友重逢"
+    chapter_refs:
+      - "chapter_002"
+    source_excerpt: "许曼坐在靠窗的位置，桌上压着一张相同符号的便签。"
+    location_id: "loc_002"
+    time_of_day: "evening"
+    characters:
+      - "char_001"
+      - "char_002"
+    summary: "林舟和许曼交换线索，确认匿名信不是偶然。"
+    conflict: "许曼想公开调查，林舟担心再次牵连无辜的人。"
+    beats:
+      - type: "action"
+        content: "林舟推门进入咖啡馆，门铃声打破沉默。"
+      - type: "dialogue"
+        speaker: "char_002"
+        content: "你也收到信了，对吗？"
+      - type: "dialogue"
+        speaker: "char_001"
+        content: "你知道寄信的人是谁？"
+      - type: "action"
+        content: "许曼把便签推到桌中央，黑色圆环正对着林舟。"
+    adaptation_notes:
+      compression: "合并了原文中两次会面，让线索交换集中在一个场景。"
+      rationale: "集中冲突可以提升剧本节奏。"
+  - id: "scene_003"
+    title: "缺失的档案"
+    chapter_refs:
+      - "chapter_003"
+    source_excerpt: "档案袋里少了一页，编号正好对应事故当晚的值班记录。"
+    location_id: "loc_003"
+    time_of_day: "night"
+    characters:
+      - "char_001"
+      - "char_002"
+    summary: "林舟和许曼找到缺页档案，确认事故记录被人为篡改。"
+    conflict: "两人必须在被发现前带走证据。"
+    beats:
+      - type: "action"
+        content: "许曼拉开铁柜，灰尘在手电光里浮起。"
+      - type: "dialogue"
+        speaker: "char_002"
+        content: "这里少了一页。"
+      - type: "dialogue"
+        speaker: "char_001"
+        content: "不是丢了，是有人拿走了。"
+      - type: "transition"
+        content: "走廊尽头传来钥匙转动的声音。"
+    adaptation_notes:
+      compression: "删减了原文中的背景说明，把重点放在缺页档案这一视觉证据上。"
+      rationale: "剧本需要通过动作和道具推动真相揭露。"
+adaptation_report:
+  scene_count: 3
+  character_count: 2
+  dialogue_count: 6
+  action_count: 6
+  validation_status: "passed"
+  repair_rounds: 0
+  compression_notes:
+    - "将章节中的心理描写转换为动作和视觉符号。"
+    - "合并重复会面，让剧情集中在三个关键场景。"
+

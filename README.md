@@ -54,7 +54,8 @@ AI：
 ## 项目文档
 
 - PRD 与 72 小时执行计划：[AI小说转剧本工具_PRD.md](./AI小说转剧本工具_PRD.md)
-- YAML Schema 文档：`docs/yaml-schema.md`，开发阶段 2 添加
+- YAML Schema 文档：[docs/yaml-schema.md](./docs/yaml-schema.md)
+- YAML Schema 文件：[schema/screenplay.schema.json](./schema/screenplay.schema.json)
 - Demo 视频脚本：`docs/demo-script.md`，开发阶段 9 添加
 
 ## 项目结构
