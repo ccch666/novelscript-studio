@@ -20,6 +20,16 @@ class ChapterAnalysisResponse(BaseModel):
     chapters: list[ChapterSummary]
 
 
+class ValidationIssue(BaseModel):
+    path: str
+    message: str
+
+
+class ValidationResponse(BaseModel):
+    passed: bool
+    errors: list[ValidationIssue]
+
+
 class GenerateScriptRequest(BaseModel):
     novel_text: str = Field(..., min_length=1)
     style: str = "film"
@@ -29,3 +39,20 @@ class GenerateScriptResponse(BaseModel):
     yaml_text: str
     model: str
     chapter_analysis: ChapterAnalysisResponse
+    validation: ValidationResponse
+    repair_rounds: int
+
+
+class ValidateScriptRequest(BaseModel):
+    yaml_text: str = Field(..., min_length=1)
+
+
+class RepairScriptRequest(BaseModel):
+    yaml_text: str = Field(..., min_length=1)
+
+
+class RepairScriptResponse(BaseModel):
+    yaml_text: str
+    model: str
+    validation: ValidationResponse
+    repair_rounds: int

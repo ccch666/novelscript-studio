@@ -288,6 +288,31 @@ button:disabled {
   margin-top: 12px;
 }
 
+.yaml-actions {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.validation-chip {
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 800;
+  padding: 6px 10px;
+}
+
+.validation-chip--pass {
+  background: #e8f6ee;
+  color: #116139;
+}
+
+.validation-chip--fail {
+  background: #fff0ed;
+  color: #9a3412;
+}
+
 pre {
   background: #101820;
   border-radius: 8px;
@@ -298,6 +323,33 @@ pre {
   overflow: auto;
   padding: 16px;
   text-align: left;
+}
+
+.validation-list {
+  display: grid;
+  gap: 8px;
+  margin-top: 12px;
+  max-height: 180px;
+  overflow: auto;
+}
+
+.validation-list article {
+  background: #fff7e6;
+  border: 1px solid #ead59f;
+  border-radius: 6px;
+  display: grid;
+  gap: 4px;
+  padding: 10px;
+}
+
+.validation-list strong {
+  color: var(--text-strong);
+  font: 700 12px/1 var(--mono);
+}
+
+.validation-list span {
+  color: var(--text);
+  font-size: 13px;
 }
 
 @media (max-width: 900px) {

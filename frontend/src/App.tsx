@@ -3,7 +3,9 @@ import {
   analyzeChapters,
   generateScript,
   readTextFile,
+  validateScript,
   type ChapterAnalysis,
+  type ValidationResponse,
 } from './api/client'
 import { sampleNovel } from './data/sampleNovel'
 import './App.css'
@@ -23,6 +25,8 @@ function App() {
   const [generationError, setGenerationError] = useState('')
   const [yamlText, setYamlText] = useState('')
   const [generationModel, setGenerationModel] = useState('')
+  const [validation, setValidation] = useState<ValidationResponse | null>(null)
+  const [repairRounds, setRepairRounds] = useState(0)
   const apiBaseUrl = useMemo(
     () => import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:8000',
     [],
@@ -62,6 +66,8 @@ function App() {
       setGenerationState('idle')
       setGenerationError('')
       setYamlText('')
+      setValidation(null)
+      setRepairRounds(0)
     } catch (error) {
       setAnalysisState('error')
       setAnalysisError(error instanceof Error ? error.message : '章节分析失败')
@@ -82,6 +88,8 @@ function App() {
       setGenerationState('idle')
       setGenerationError('')
       setYamlText('')
+      setValidation(null)
+      setRepairRounds(0)
     } catch (error) {
       setAnalysisState('error')
       setAnalysisError(error instanceof Error ? error.message : '文件读取失败')
@@ -96,6 +104,8 @@ function App() {
     setGenerationState('idle')
     setGenerationError('')
     setYamlText('')
+    setValidation(null)
+    setRepairRounds(0)
   }
 
   const canAnalyze = novelText.trim().length > 0 && analysisState !== 'loading'
@@ -111,6 +121,8 @@ function App() {
       setYamlText(result.yaml_text)
       setAnalysis(result.chapter_analysis)
       setGenerationModel(result.model)
+      setValidation(result.validation)
+      setRepairRounds(result.repair_rounds)
       setGenerationState('success')
     } catch (error) {
       setGenerationState('error')
@@ -132,7 +144,7 @@ function App() {
       </header>
 
       <section className="status-bar">
-        <span>阶段 4：DeepSeek 剧本生成</span>
+        <span>阶段 5：Schema 校验与自动修复</span>
         <code>{healthMessage}</code>
       </section>
 
@@ -154,6 +166,8 @@ function App() {
               setGenerationState('idle')
               setGenerationError('')
               setYamlText('')
+              setValidation(null)
+              setRepairRounds(0)
             }}
           />
           <div className="panel-actions">
@@ -238,7 +252,7 @@ function App() {
             </article>
             <article>
               <span>Schema</span>
-              <strong>下一阶段会加入 Schema 校验与自动修复</strong>
+              <strong>{validation?.passed ? '校验通过，可以进入编辑导出' : validation ? '校验失败，已显示错误' : '生成后会自动校验并尝试修复'}</strong>
             </article>
           </div>
           {generationState === 'error' && (
@@ -250,7 +264,7 @@ function App() {
           {generationState === 'success' && (
             <div className="notice notice--success generation-notice">
               <strong>生成完成</strong>
-              <span>模型：{generationModel}</span>
+              <span>模型：{generationModel}，自动修复 {repairRounds} 轮</span>
             </div>
           )}
         </div>
@@ -260,6 +274,26 @@ function App() {
             <p className="panel-kicker">YAML</p>
             <h2>结构化输出</h2>
           </div>
+          <div className="yaml-actions">
+            <button
+              type="button"
+              disabled={!yamlText}
+              onClick={async () => {
+                if (!yamlText) {
+                  return
+                }
+                const result = await validateScript(yamlText)
+                setValidation(result)
+              }}
+            >
+              校验 YAML
+            </button>
+            {validation && (
+              <span className={validation.passed ? 'validation-chip validation-chip--pass' : 'validation-chip validation-chip--fail'}>
+                {validation.passed ? 'Schema 通过' : `Schema 失败：${validation.errors.length} 项`}
+              </span>
+            )}
+          </div>
           <pre>{yamlText || `metadata:
   title: ""
 source:
@@ -267,6 +301,16 @@ source:
 characters: []
 locations: []
 scenes: []`}</pre>
+          {validation && !validation.passed && (
+            <div className="validation-list">
+              {validation.errors.slice(0, 6).map((error) => (
+                <article key={`${error.path}-${error.message}`}>
+                  <strong>{error.path}</strong>
+                  <span>{error.message}</span>
+                </article>
+              ))}
+            </div>
+          )}
         </div>
       </section>
     </main>
