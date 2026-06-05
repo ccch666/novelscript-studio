@@ -284,6 +284,10 @@ button:disabled {
   line-height: 1.5;
 }
 
+.generation-notice {
+  margin-top: 12px;
+}
+
 pre {
   background: #101820;
   border-radius: 8px;

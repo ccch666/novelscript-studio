@@ -19,3 +19,13 @@ class ChapterAnalysisResponse(BaseModel):
     message: str
     chapters: list[ChapterSummary]
 
+
+class GenerateScriptRequest(BaseModel):
+    novel_text: str = Field(..., min_length=1)
+    style: str = "film"
+
+
+class GenerateScriptResponse(BaseModel):
+    yaml_text: str
+    model: str
+    chapter_analysis: ChapterAnalysisResponse

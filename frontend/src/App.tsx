@@ -1,10 +1,16 @@
 import { useEffect, useMemo, useState } from 'react'
-import { analyzeChapters, readTextFile, type ChapterAnalysis } from './api/client'
+import {
+  analyzeChapters,
+  generateScript,
+  readTextFile,
+  type ChapterAnalysis,
+} from './api/client'
 import { sampleNovel } from './data/sampleNovel'
 import './App.css'
 
 type HealthState = 'checking' | 'online' | 'offline'
 type AnalysisState = 'idle' | 'loading' | 'success' | 'error'
+type GenerationState = 'idle' | 'loading' | 'success' | 'error'
 
 function App() {
   const [health, setHealth] = useState<HealthState>('checking')
@@ -13,6 +19,10 @@ function App() {
   const [analysis, setAnalysis] = useState<ChapterAnalysis | null>(null)
   const [analysisState, setAnalysisState] = useState<AnalysisState>('idle')
   const [analysisError, setAnalysisError] = useState('')
+  const [generationState, setGenerationState] = useState<GenerationState>('idle')
+  const [generationError, setGenerationError] = useState('')
+  const [yamlText, setYamlText] = useState('')
+  const [generationModel, setGenerationModel] = useState('')
   const apiBaseUrl = useMemo(
     () => import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:8000',
     [],
@@ -49,6 +59,9 @@ function App() {
       const result = await analyzeChapters(novelText)
       setAnalysis(result)
       setAnalysisState('success')
+      setGenerationState('idle')
+      setGenerationError('')
+      setYamlText('')
     } catch (error) {
       setAnalysisState('error')
       setAnalysisError(error instanceof Error ? error.message : '章节分析失败')
@@ -66,6 +79,9 @@ function App() {
       setAnalysis(null)
       setAnalysisState('idle')
       setAnalysisError('')
+      setGenerationState('idle')
+      setGenerationError('')
+      setYamlText('')
     } catch (error) {
       setAnalysisState('error')
       setAnalysisError(error instanceof Error ? error.message : '文件读取失败')
@@ -77,9 +93,30 @@ function App() {
     setAnalysis(null)
     setAnalysisState('idle')
     setAnalysisError('')
+    setGenerationState('idle')
+    setGenerationError('')
+    setYamlText('')
   }
 
   const canAnalyze = novelText.trim().length > 0 && analysisState !== 'loading'
+  const canGenerate =
+    Boolean(analysis?.is_valid) && generationState !== 'loading' && analysisState !== 'loading'
+
+  async function handleGenerate() {
+    setGenerationState('loading')
+    setGenerationError('')
+
+    try {
+      const result = await generateScript(novelText, 'film')
+      setYamlText(result.yaml_text)
+      setAnalysis(result.chapter_analysis)
+      setGenerationModel(result.model)
+      setGenerationState('success')
+    } catch (error) {
+      setGenerationState('error')
+      setGenerationError(error instanceof Error ? error.message : '剧本生成失败')
+    }
+  }
 
   return (
     <main className="workspace-shell">
@@ -95,7 +132,7 @@ function App() {
       </header>
 
       <section className="status-bar">
-        <span>阶段 3：小说输入与章节识别</span>
+        <span>阶段 4：DeepSeek 剧本生成</span>
         <code>{healthMessage}</code>
       </section>
 
@@ -114,6 +151,9 @@ function App() {
               setAnalysis(null)
               setAnalysisState('idle')
               setAnalysisError('')
+              setGenerationState('idle')
+              setGenerationError('')
+              setYamlText('')
             }}
           />
           <div className="panel-actions">
@@ -130,6 +170,9 @@ function App() {
             </button>
             <button type="button" className="primary-action" disabled={!canAnalyze} onClick={handleAnalyze}>
               {analysisState === 'loading' ? '分析中' : '分析章节'}
+            </button>
+            <button type="button" className="primary-action" disabled={!canGenerate} onClick={handleGenerate}>
+              {generationState === 'loading' ? '生成中' : '生成剧本'}
             </button>
           </div>
         </div>
@@ -191,13 +234,25 @@ function App() {
           <div className="scene-list">
             <article>
               <span>Scene 001</span>
-              <strong>{analysis?.is_valid ? '下一阶段将基于章节生成场景' : '需先通过 3 章校验'}</strong>
+              <strong>{yamlText ? 'YAML 初稿已生成' : analysis?.is_valid ? '可以调用 DeepSeek 生成场景' : '需先通过 3 章校验'}</strong>
             </article>
             <article>
               <span>Schema</span>
-              <strong>后续生成结果会先校验，再允许导出</strong>
+              <strong>下一阶段会加入 Schema 校验与自动修复</strong>
             </article>
           </div>
+          {generationState === 'error' && (
+            <div className="notice notice--error generation-notice">
+              <strong>生成失败</strong>
+              <span>{generationError}</span>
+            </div>
+          )}
+          {generationState === 'success' && (
+            <div className="notice notice--success generation-notice">
+              <strong>生成完成</strong>
+              <span>模型：{generationModel}</span>
+            </div>
+          )}
         </div>
 
         <div className="panel panel--yaml">
@@ -205,7 +260,7 @@ function App() {
             <p className="panel-kicker">YAML</p>
             <h2>结构化输出</h2>
           </div>
-          <pre>{`metadata:
+          <pre>{yamlText || `metadata:
   title: ""
 source:
   chapter_count: ${analysis?.chapter_count ?? 0}
