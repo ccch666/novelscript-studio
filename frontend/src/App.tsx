@@ -1,11 +1,18 @@
 import { useEffect, useMemo, useState } from 'react'
+import { analyzeChapters, readTextFile, type ChapterAnalysis } from './api/client'
+import { sampleNovel } from './data/sampleNovel'
 import './App.css'
 
 type HealthState = 'checking' | 'online' | 'offline'
+type AnalysisState = 'idle' | 'loading' | 'success' | 'error'
 
 function App() {
   const [health, setHealth] = useState<HealthState>('checking')
   const [healthMessage, setHealthMessage] = useState('正在连接 FastAPI 后端')
+  const [novelText, setNovelText] = useState('')
+  const [analysis, setAnalysis] = useState<ChapterAnalysis | null>(null)
+  const [analysisState, setAnalysisState] = useState<AnalysisState>('idle')
+  const [analysisError, setAnalysisError] = useState('')
   const apiBaseUrl = useMemo(
     () => import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:8000',
     [],
@@ -34,6 +41,46 @@ function App() {
     return () => controller.abort()
   }, [apiBaseUrl])
 
+  async function handleAnalyze() {
+    setAnalysisState('loading')
+    setAnalysisError('')
+
+    try {
+      const result = await analyzeChapters(novelText)
+      setAnalysis(result)
+      setAnalysisState('success')
+    } catch (error) {
+      setAnalysisState('error')
+      setAnalysisError(error instanceof Error ? error.message : '章节分析失败')
+    }
+  }
+
+  async function handleFileChange(file: File | undefined) {
+    if (!file) {
+      return
+    }
+
+    try {
+      const content = await readTextFile(file)
+      setNovelText(content)
+      setAnalysis(null)
+      setAnalysisState('idle')
+      setAnalysisError('')
+    } catch (error) {
+      setAnalysisState('error')
+      setAnalysisError(error instanceof Error ? error.message : '文件读取失败')
+    }
+  }
+
+  function handleLoadSample() {
+    setNovelText(sampleNovel)
+    setAnalysis(null)
+    setAnalysisState('idle')
+    setAnalysisError('')
+  }
+
+  const canAnalyze = novelText.trim().length > 0 && analysisState !== 'loading'
+
   return (
     <main className="workspace-shell">
       <header className="app-header">
@@ -48,7 +95,7 @@ function App() {
       </header>
 
       <section className="status-bar">
-        <span>阶段 1：前后端工程骨架</span>
+        <span>阶段 3：小说输入与章节识别</span>
         <code>{healthMessage}</code>
       </section>
 
@@ -60,15 +107,29 @@ function App() {
           </div>
           <textarea
             aria-label="小说文本输入"
-            placeholder="阶段 3 将支持粘贴 3 个章节以上的小说文本"
-            disabled
+            value={novelText}
+            placeholder="粘贴 3 个章节以上的小说文本，例如：第一章、第二章、第三章..."
+            onChange={(event) => {
+              setNovelText(event.target.value)
+              setAnalysis(null)
+              setAnalysisState('idle')
+              setAnalysisError('')
+            }}
           />
           <div className="panel-actions">
-            <button type="button" disabled>
+            <label className="file-button">
+              上传 TXT
+              <input
+                type="file"
+                accept=".txt,text/plain"
+                onChange={(event) => handleFileChange(event.target.files?.[0])}
+              />
+            </label>
+            <button type="button" onClick={handleLoadSample}>
               加载示例
             </button>
-            <button type="button" className="primary-action" disabled>
-              生成剧本
+            <button type="button" className="primary-action" disabled={!canAnalyze} onClick={handleAnalyze}>
+              {analysisState === 'loading' ? '分析中' : '分析章节'}
             </button>
           </div>
         </div>
@@ -78,10 +139,48 @@ function App() {
             <p className="panel-kicker">分析</p>
             <h2>章节与人物</h2>
           </div>
-          <div className="empty-state">
-            <strong>等待小说输入</strong>
-            <span>章节识别、人物提取和地点提取将在这里展示。</span>
-          </div>
+          {analysisState === 'idle' && (
+            <div className="empty-state">
+              <strong>等待小说输入</strong>
+              <span>章节识别结果将在这里展示，阶段 4 后会继续增加人物和地点提取。</span>
+            </div>
+          )}
+          {analysisState === 'loading' && (
+            <div className="empty-state">
+              <strong>正在分析章节</strong>
+              <span>FastAPI 后端正在识别章节标题、章节数和字数。</span>
+            </div>
+          )}
+          {analysisState === 'error' && (
+            <div className="notice notice--error">
+              <strong>分析失败</strong>
+              <span>{analysisError}</span>
+            </div>
+          )}
+          {analysisState === 'success' && analysis && (
+            <div className="analysis-result">
+              <div className={`notice ${analysis.is_valid ? 'notice--success' : 'notice--warning'}`}>
+                <strong>{analysis.is_valid ? '满足题目要求' : '章节数不足'}</strong>
+                <span>{analysis.message}</span>
+              </div>
+              <div className="metric-row">
+                <span>章节数：{analysis.chapter_count}</span>
+                <span>总字数：{analysis.total_word_count}</span>
+              </div>
+              <div className="chapter-list">
+                {analysis.chapters.map((chapter) => (
+                  <article key={chapter.id}>
+                    <div>
+                      <span>{chapter.id}</span>
+                      <strong>{chapter.title}</strong>
+                    </div>
+                    <p>{chapter.preview}</p>
+                    <small>{chapter.word_count} 字</small>
+                  </article>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
 
         <div className="panel panel--scenes">
@@ -92,7 +191,7 @@ function App() {
           <div className="scene-list">
             <article>
               <span>Scene 001</span>
-              <strong>来源章节、地点、时间、人物、动作与对白</strong>
+              <strong>{analysis?.is_valid ? '下一阶段将基于章节生成场景' : '需先通过 3 章校验'}</strong>
             </article>
             <article>
               <span>Schema</span>
@@ -109,7 +208,7 @@ function App() {
           <pre>{`metadata:
   title: ""
 source:
-  chapter_count: 0
+  chapter_count: ${analysis?.chapter_count ?? 0}
 characters: []
 locations: []
 scenes: []`}</pre>
