@@ -56,3 +56,7 @@ class RepairScriptResponse(BaseModel):
     model: str
     validation: ValidationResponse
     repair_rounds: int
+
+
+class SampleContentResponse(BaseModel):
+    content: str

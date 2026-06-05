@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
@@ -9,6 +11,7 @@ from app.models import (
     GenerateScriptResponse,
     RepairScriptRequest,
     RepairScriptResponse,
+    SampleContentResponse,
     ValidateScriptRequest,
     ValidationResponse,
 )
@@ -18,6 +21,9 @@ from app.services.screenplay_generator import generate_screenplay_yaml
 from app.services.yaml_repairer import repair_yaml_until_valid
 from app.services.yaml_validator import validate_screenplay_yaml
 from app.settings import get_settings
+
+
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
 
 
 class HealthResponse(BaseModel):
@@ -51,7 +57,7 @@ async def health_check() -> HealthResponse:
         status="ok",
         service="novelscript-studio-api",
         version="0.1.0",
-        stage="script-workspace",
+        stage="adaptation-report",
     )
 
 
@@ -111,3 +117,15 @@ async def repair_script(request: RepairScriptRequest) -> RepairScriptResponse:
         validation=validation,
         repair_rounds=repair_rounds,
     )
+
+
+@app.get("/api/samples/novel", response_model=SampleContentResponse)
+async def get_sample_novel() -> SampleContentResponse:
+    content = (PROJECT_ROOT / "samples" / "sample-novel.txt").read_text(encoding="utf-8")
+    return SampleContentResponse(content=content)
+
+
+@app.get("/api/samples/output", response_model=SampleContentResponse)
+async def get_sample_output() -> SampleContentResponse:
+    content = (PROJECT_ROOT / "samples" / "sample-output.yaml").read_text(encoding="utf-8")
+    return SampleContentResponse(content=content)

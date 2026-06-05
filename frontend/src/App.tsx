@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import {
   analyzeChapters,
   generateScript,
+  getSampleOutput,
   readTextFile,
   validateScript,
   type ChapterAnalysis,
@@ -10,6 +11,7 @@ import {
 import { sampleNovel } from './data/sampleNovel'
 import {
   buildLookup,
+  buildAdaptationMetrics,
   countBeats,
   getExportFilename,
   parseScreenplayYaml,
@@ -135,6 +137,7 @@ function App() {
   const characterById = useMemo(() => buildLookup(screenplay?.characters), [screenplay])
   const locationById = useMemo(() => buildLookup(screenplay?.locations), [screenplay])
   const scenes = screenplay?.scenes ?? []
+  const adaptationMetrics = useMemo(() => buildAdaptationMetrics(screenplay), [screenplay])
 
   function handleYamlChange(value: string) {
     setYamlText(value)
@@ -176,6 +179,22 @@ function App() {
     URL.revokeObjectURL(url)
   }
 
+  async function handleLoadSampleOutput() {
+    try {
+      const output = await getSampleOutput()
+      setYamlText(output)
+      setGenerationState('success')
+      setGenerationError('')
+      setGenerationModel('sample-output')
+      setRepairRounds(0)
+      const result = await validateScript(output)
+      setValidation(result)
+    } catch (error) {
+      setGenerationState('error')
+      setGenerationError(error instanceof Error ? error.message : '示例 YAML 加载失败')
+    }
+  }
+
   async function handleGenerate() {
     setGenerationState('loading')
     setGenerationError('')
@@ -208,7 +227,7 @@ function App() {
       </header>
 
       <section className="status-bar">
-        <span>阶段 6：剧本预览、编辑与导出</span>
+        <span>阶段 7：改编报告与样例数据</span>
         <code>{healthMessage}</code>
       </section>
 
@@ -252,6 +271,9 @@ function App() {
             <button type="button" className="primary-action" disabled={!canGenerate} onClick={handleGenerate}>
               {generationState === 'loading' ? '生成中' : '生成剧本'}
             </button>
+            <button type="button" onClick={handleLoadSampleOutput}>
+              加载示例 YAML
+            </button>
           </div>
         </div>
 
@@ -260,10 +282,51 @@ function App() {
             <p className="panel-kicker">分析</p>
             <h2>章节与人物</h2>
           </div>
-          {analysisState === 'idle' && (
+          {analysisState === 'idle' && !screenplay && (
             <div className="empty-state">
               <strong>等待小说输入</strong>
               <span>章节识别结果将在这里展示，阶段 4 后会继续增加人物和地点提取。</span>
+            </div>
+          )}
+          {analysisState === 'idle' && screenplay && (
+            <div className="analysis-result">
+              {screenplay.characters?.length ? (
+                <div className="character-list">
+                  {screenplay.characters.map((character) => (
+                    <article key={character.id}>
+                      <span>{character.id}</span>
+                      <strong>{character.name}</strong>
+                      <small>{character.role ?? 'unknown'}</small>
+                    </article>
+                  ))}
+                </div>
+              ) : null}
+              <div className="report-grid">
+                <article>
+                  <span>场景</span>
+                  <strong>{adaptationMetrics.sceneCount}</strong>
+                </article>
+                <article>
+                  <span>角色</span>
+                  <strong>{adaptationMetrics.characterCount}</strong>
+                </article>
+                <article>
+                  <span>对白</span>
+                  <strong>{adaptationMetrics.dialogueCount}</strong>
+                </article>
+                <article>
+                  <span>动作</span>
+                  <strong>{adaptationMetrics.actionCount}</strong>
+                </article>
+                <article>
+                  <span>校验</span>
+                  <strong>{validation?.passed ? '通过' : adaptationMetrics.validationStatus}</strong>
+                </article>
+                <article>
+                  <span>修复</span>
+                  <strong>{repairRounds || adaptationMetrics.repairRounds}</strong>
+                </article>
+              </div>
             </div>
           )}
           {analysisState === 'loading' && (
@@ -311,6 +374,34 @@ function App() {
                   ))}
                 </div>
               ) : null}
+              {yamlText && (
+                <div className="report-grid">
+                  <article>
+                    <span>场景</span>
+                    <strong>{adaptationMetrics.sceneCount}</strong>
+                  </article>
+                  <article>
+                    <span>角色</span>
+                    <strong>{adaptationMetrics.characterCount}</strong>
+                  </article>
+                  <article>
+                    <span>对白</span>
+                    <strong>{adaptationMetrics.dialogueCount}</strong>
+                  </article>
+                  <article>
+                    <span>动作</span>
+                    <strong>{adaptationMetrics.actionCount}</strong>
+                  </article>
+                  <article>
+                    <span>校验</span>
+                    <strong>{validation?.passed ? '通过' : adaptationMetrics.validationStatus}</strong>
+                  </article>
+                  <article>
+                    <span>修复</span>
+                    <strong>{repairRounds || adaptationMetrics.repairRounds}</strong>
+                  </article>
+                </div>
+              )}
             </div>
           )}
         </div>

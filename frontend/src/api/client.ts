@@ -84,6 +84,18 @@ export async function validateScript(yamlText: string): Promise<ValidationRespon
   return response.json()
 }
 
+export async function getSampleOutput(): Promise<string> {
+  const response = await fetch(`${API_BASE_URL}/api/samples/output`)
+
+  if (!response.ok) {
+    const detail = await response.json().catch(() => null)
+    throw new Error(detail?.detail || `HTTP ${response.status}`)
+  }
+
+  const data = await response.json()
+  return data.content
+}
+
 export async function readTextFile(file: File): Promise<string> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader()
