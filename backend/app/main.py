@@ -51,7 +51,7 @@ async def health_check() -> HealthResponse:
         status="ok",
         service="novelscript-studio-api",
         version="0.1.0",
-        stage="schema-validation",
+        stage="script-workspace",
     )
 
 

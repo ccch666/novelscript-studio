@@ -8,11 +8,25 @@ import {
   type ValidationResponse,
 } from './api/client'
 import { sampleNovel } from './data/sampleNovel'
+import {
+  buildLookup,
+  countBeats,
+  getExportFilename,
+  parseScreenplayYaml,
+} from './utils/screenplay'
 import './App.css'
 
 type HealthState = 'checking' | 'online' | 'offline'
 type AnalysisState = 'idle' | 'loading' | 'success' | 'error'
 type GenerationState = 'idle' | 'loading' | 'success' | 'error'
+
+const EMPTY_YAML = `metadata:
+  title: ""
+source:
+  chapter_count: 0
+characters: []
+locations: []
+scenes: []`
 
 function App() {
   const [health, setHealth] = useState<HealthState>('checking')
@@ -111,6 +125,56 @@ function App() {
   const canAnalyze = novelText.trim().length > 0 && analysisState !== 'loading'
   const canGenerate =
     Boolean(analysis?.is_valid) && generationState !== 'loading' && analysisState !== 'loading'
+  const screenplay = useMemo(() => {
+    try {
+      return parseScreenplayYaml(yamlText)
+    } catch {
+      return null
+    }
+  }, [yamlText])
+  const characterById = useMemo(() => buildLookup(screenplay?.characters), [screenplay])
+  const locationById = useMemo(() => buildLookup(screenplay?.locations), [screenplay])
+  const scenes = screenplay?.scenes ?? []
+
+  function handleYamlChange(value: string) {
+    setYamlText(value)
+    setValidation(null)
+  }
+
+  async function handleValidateYaml() {
+    if (!yamlText) {
+      return
+    }
+
+    try {
+      const result = await validateScript(yamlText)
+      setValidation(result)
+    } catch (error) {
+      setValidation({
+        passed: false,
+        errors: [
+          {
+            path: '<request>',
+            message: error instanceof Error ? error.message : 'YAML 校验失败',
+          },
+        ],
+      })
+    }
+  }
+
+  function handleExportYaml() {
+    if (!yamlText) {
+      return
+    }
+
+    const blob = new Blob([yamlText], { type: 'application/x-yaml;charset=utf-8' })
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = getExportFilename(screenplay)
+    link.click()
+    URL.revokeObjectURL(url)
+  }
 
   async function handleGenerate() {
     setGenerationState('loading')
@@ -144,7 +208,7 @@ function App() {
       </header>
 
       <section className="status-bar">
-        <span>阶段 5：Schema 校验与自动修复</span>
+        <span>阶段 6：剧本预览、编辑与导出</span>
         <code>{healthMessage}</code>
       </section>
 
@@ -236,6 +300,17 @@ function App() {
                   </article>
                 ))}
               </div>
+              {screenplay?.characters?.length ? (
+                <div className="character-list">
+                  {screenplay.characters.map((character) => (
+                    <article key={character.id}>
+                      <span>{character.id}</span>
+                      <strong>{character.name}</strong>
+                      <small>{character.role ?? 'unknown'}</small>
+                    </article>
+                  ))}
+                </div>
+              ) : null}
             </div>
           )}
         </div>
@@ -245,16 +320,46 @@ function App() {
             <p className="panel-kicker">剧本</p>
             <h2>场景卡片</h2>
           </div>
-          <div className="scene-list">
-            <article>
-              <span>Scene 001</span>
-              <strong>{yamlText ? 'YAML 初稿已生成' : analysis?.is_valid ? '可以调用 DeepSeek 生成场景' : '需先通过 3 章校验'}</strong>
-            </article>
-            <article>
-              <span>Schema</span>
-              <strong>{validation?.passed ? '校验通过，可以进入编辑导出' : validation ? '校验失败，已显示错误' : '生成后会自动校验并尝试修复'}</strong>
-            </article>
-          </div>
+          {scenes.length > 0 ? (
+            <div className="scene-list">
+              {scenes.map((scene) => {
+                const locationName = scene.location_id ? locationById[scene.location_id]?.name : '未设置地点'
+                const characterNames = (scene.characters ?? [])
+                  .map((id) => characterById[id]?.name ?? id)
+                  .join('、')
+                return (
+                  <article className="scene-card" key={scene.id}>
+                    <div className="scene-card__head">
+                      <span>{scene.id}</span>
+                      <strong>{scene.title}</strong>
+                    </div>
+                    <div className="scene-meta">
+                      <span>{locationName}</span>
+                      <span>{scene.time_of_day ?? 'unknown'}</span>
+                      <span>{characterNames || '无出场人物'}</span>
+                    </div>
+                    <p>{scene.summary}</p>
+                    <small>{scene.conflict}</small>
+                    <div className="beat-summary">
+                      <span>动作 {countBeats(scene, 'action')}</span>
+                      <span>对白 {countBeats(scene, 'dialogue')}</span>
+                    </div>
+                  </article>
+                )
+              })}
+            </div>
+          ) : (
+            <div className="scene-list">
+              <article>
+                <span>Scene 001</span>
+                <strong>{yamlText ? 'YAML 暂无法解析为场景' : analysis?.is_valid ? '可以调用 DeepSeek 生成场景' : '需先通过 3 章校验'}</strong>
+              </article>
+              <article>
+                <span>Schema</span>
+                <strong>{validation?.passed ? '校验通过，可以进入编辑导出' : validation ? '校验失败，已显示错误' : '生成后会自动校验并尝试修复'}</strong>
+              </article>
+            </div>
+          )}
           {generationState === 'error' && (
             <div className="notice notice--error generation-notice">
               <strong>生成失败</strong>
@@ -278,15 +383,12 @@ function App() {
             <button
               type="button"
               disabled={!yamlText}
-              onClick={async () => {
-                if (!yamlText) {
-                  return
-                }
-                const result = await validateScript(yamlText)
-                setValidation(result)
-              }}
+              onClick={handleValidateYaml}
             >
               校验 YAML
+            </button>
+            <button type="button" disabled={!yamlText} onClick={handleExportYaml}>
+              导出 YAML
             </button>
             {validation && (
               <span className={validation.passed ? 'validation-chip validation-chip--pass' : 'validation-chip validation-chip--fail'}>
@@ -294,13 +396,13 @@ function App() {
               </span>
             )}
           </div>
-          <pre>{yamlText || `metadata:
-  title: ""
-source:
-  chapter_count: ${analysis?.chapter_count ?? 0}
-characters: []
-locations: []
-scenes: []`}</pre>
+          <textarea
+            className="yaml-editor"
+            aria-label="YAML 剧本编辑器"
+            disabled={!yamlText}
+            value={yamlText || EMPTY_YAML.replace('chapter_count: 0', `chapter_count: ${analysis?.chapter_count ?? 0}`)}
+            onChange={(event) => handleYamlChange(event.target.value)}
+          />
           {validation && !validation.passed && (
             <div className="validation-list">
               {validation.errors.slice(0, 6).map((error) => (
