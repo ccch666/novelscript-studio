@@ -139,6 +139,7 @@ http://127.0.0.1:5173
 - PRD 与 72 小时执行计划：[AI小说转剧本工具_PRD.md](./AI小说转剧本工具_PRD.md)
 - YAML Schema 文档：[docs/yaml-schema.md](./docs/yaml-schema.md)
 - Demo 视频脚本：[docs/demo-script.md](./docs/demo-script.md)
+- 最终自测清单：[docs/final-readiness.md](./docs/final-readiness.md)
 - YAML Schema 文件：[schema/screenplay.schema.json](./schema/screenplay.schema.json)
 - 示例小说：[samples/sample-novel.txt](./samples/sample-novel.txt)
 - 示例 YAML：[samples/sample-output.yaml](./samples/sample-output.yaml)
@@ -194,7 +195,7 @@ curl http://127.0.0.1:8000/api/health
 
 ## 当前完成阶段
 
-已完成阶段 0 至阶段 9：
+已完成阶段 0 至阶段 10：
 
 1. 项目规划、README、PR 模板和基础目录。
 2. React 前端和 FastAPI 后端工程骨架。
@@ -206,8 +207,9 @@ curl http://127.0.0.1:8000/api/health
 8. 改编报告与样例数据。
 9. 界面体验打磨。
 10. README、demo 脚本和最终提交文档。
+11. 最终自测与公开准备。
 
-下一阶段为最终自测与公开准备。
+Demo 视频链接待录制后替换 README 顶部占位。
 
 ## 学术诚信与知识产权
 
