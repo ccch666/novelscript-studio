@@ -21,6 +21,7 @@ import './App.css'
 type HealthState = 'checking' | 'online' | 'offline'
 type AnalysisState = 'idle' | 'loading' | 'success' | 'error'
 type GenerationState = 'idle' | 'loading' | 'success' | 'error'
+type SampleState = 'idle' | 'loading' | 'error'
 
 const EMPTY_YAML = `metadata:
   title: ""
@@ -39,6 +40,7 @@ function App() {
   const [analysisError, setAnalysisError] = useState('')
   const [generationState, setGenerationState] = useState<GenerationState>('idle')
   const [generationError, setGenerationError] = useState('')
+  const [sampleState, setSampleState] = useState<SampleState>('idle')
   const [yamlText, setYamlText] = useState('')
   const [generationModel, setGenerationModel] = useState('')
   const [validation, setValidation] = useState<ValidationResponse | null>(null)
@@ -81,6 +83,7 @@ function App() {
       setAnalysisState('success')
       setGenerationState('idle')
       setGenerationError('')
+      setSampleState('idle')
       setYamlText('')
       setValidation(null)
       setRepairRounds(0)
@@ -103,6 +106,7 @@ function App() {
       setAnalysisError('')
       setGenerationState('idle')
       setGenerationError('')
+      setSampleState('idle')
       setYamlText('')
       setValidation(null)
       setRepairRounds(0)
@@ -119,14 +123,16 @@ function App() {
     setAnalysisError('')
     setGenerationState('idle')
     setGenerationError('')
+    setSampleState('idle')
     setYamlText('')
     setValidation(null)
     setRepairRounds(0)
   }
 
-  const canAnalyze = novelText.trim().length > 0 && analysisState !== 'loading'
+  const isBusy = analysisState === 'loading' || generationState === 'loading' || sampleState === 'loading'
+  const canAnalyze = novelText.trim().length > 0 && !isBusy
   const canGenerate =
-    Boolean(analysis?.is_valid) && generationState !== 'loading' && analysisState !== 'loading'
+    Boolean(analysis?.is_valid) && !isBusy
   const screenplay = useMemo(() => {
     try {
       return parseScreenplayYaml(yamlText)
@@ -138,6 +144,9 @@ function App() {
   const locationById = useMemo(() => buildLookup(screenplay?.locations), [screenplay])
   const scenes = screenplay?.scenes ?? []
   const adaptationMetrics = useMemo(() => buildAdaptationMetrics(screenplay), [screenplay])
+  const chapterCount = analysis?.chapter_count ?? screenplay?.source?.chapter_count
+  const hasValidChapterCount =
+    analysis?.is_valid ?? (typeof screenplay?.source?.chapter_count === 'number' && screenplay.source.chapter_count >= 3)
 
   function handleYamlChange(value: string) {
     setYamlText(value)
@@ -180,6 +189,9 @@ function App() {
   }
 
   async function handleLoadSampleOutput() {
+    setSampleState('loading')
+    setGenerationError('')
+
     try {
       const output = await getSampleOutput()
       setYamlText(output)
@@ -189,7 +201,9 @@ function App() {
       setRepairRounds(0)
       const result = await validateScript(output)
       setValidation(result)
+      setSampleState('idle')
     } catch (error) {
+      setSampleState('error')
       setGenerationState('error')
       setGenerationError(error instanceof Error ? error.message : '示例 YAML 加载失败')
     }
@@ -227,8 +241,27 @@ function App() {
       </header>
 
       <section className="status-bar">
-        <span>阶段 7：改编报告与样例数据</span>
+        <span>阶段 8：界面体验打磨</span>
         <code>{healthMessage}</code>
+      </section>
+
+      <section className="workflow-strip" aria-label="工作流状态">
+        <article className={hasValidChapterCount ? 'workflow-step workflow-step--done' : 'workflow-step'}>
+          <span>章节</span>
+          <strong>{chapterCount ?? '-'}</strong>
+        </article>
+        <article className={yamlText ? 'workflow-step workflow-step--done' : 'workflow-step'}>
+          <span>YAML</span>
+          <strong>{yamlText ? '已生成' : '等待'}</strong>
+        </article>
+        <article className={validation?.passed ? 'workflow-step workflow-step--done' : validation ? 'workflow-step workflow-step--warn' : 'workflow-step'}>
+          <span>Schema</span>
+          <strong>{validation?.passed ? '通过' : validation ? '待修复' : '未校验'}</strong>
+        </article>
+        <article className={yamlText ? 'workflow-step workflow-step--done' : 'workflow-step'}>
+          <span>导出</span>
+          <strong>{yamlText ? '可用' : '等待'}</strong>
+        </article>
       </section>
 
       <section className="workspace-grid">
@@ -248,6 +281,7 @@ function App() {
               setAnalysisError('')
               setGenerationState('idle')
               setGenerationError('')
+              setSampleState('idle')
               setYamlText('')
               setValidation(null)
               setRepairRounds(0)
@@ -262,7 +296,7 @@ function App() {
                 onChange={(event) => handleFileChange(event.target.files?.[0])}
               />
             </label>
-            <button type="button" onClick={handleLoadSample}>
+            <button type="button" disabled={isBusy} onClick={handleLoadSample}>
               加载示例
             </button>
             <button type="button" className="primary-action" disabled={!canAnalyze} onClick={handleAnalyze}>
@@ -271,8 +305,8 @@ function App() {
             <button type="button" className="primary-action" disabled={!canGenerate} onClick={handleGenerate}>
               {generationState === 'loading' ? '生成中' : '生成剧本'}
             </button>
-            <button type="button" onClick={handleLoadSampleOutput}>
-              加载示例 YAML
+            <button type="button" disabled={isBusy} onClick={handleLoadSampleOutput}>
+              {sampleState === 'loading' ? '加载中' : '加载示例 YAML'}
             </button>
           </div>
         </div>
@@ -455,6 +489,12 @@ function App() {
             <div className="notice notice--error generation-notice">
               <strong>生成失败</strong>
               <span>{generationError}</span>
+            </div>
+          )}
+          {generationState === 'loading' && (
+            <div className="notice notice--warning generation-notice">
+              <strong>正在生成并校验</strong>
+              <span>DeepSeek 正在输出剧本，后端会自动进行 Schema 校验与修复。</span>
             </div>
           )}
           {generationState === 'success' && (

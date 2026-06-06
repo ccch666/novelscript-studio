@@ -33,6 +33,11 @@ export type ScreenplayDocument = {
   metadata?: {
     title?: string
   }
+  source?: {
+    title?: string
+    chapter_count?: number
+    language?: string
+  }
   adaptation_report?: {
     scene_count?: number
     character_count?: number
