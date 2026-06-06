@@ -241,7 +241,7 @@ function App() {
       </header>
 
       <section className="status-bar">
-        <span>阶段 8：界面体验打磨</span>
+        <span>阶段 9：最终文档与 demo 脚本</span>
         <code>{healthMessage}</code>
       </section>
 
