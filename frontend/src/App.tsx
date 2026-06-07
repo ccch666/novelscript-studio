@@ -226,64 +226,66 @@ function App() {
 
   return (
     <main className="workspace-shell">
-      <AppHeader health={health} healthMessage={healthMessage} />
-      <WorkflowStatus
-        chapterCount={chapterCount}
-        hasValidChapterCount={hasValidChapterCount}
-        validation={validation}
-        yamlText={yamlText}
-      />
-      <section className="workspace-grid">
-        <div className="workspace-column workspace-column--source">
-          <SourcePanel
-            analysisState={analysisState}
-            canAnalyze={canAnalyze}
-            canGenerate={canGenerate}
-            generationState={generationState}
-            isBusy={isBusy}
-            novelText={novelText}
-            onAnalyze={handleAnalyze}
-            onFileChange={handleFileChange}
-            onGenerate={handleGenerate}
-            onLoadSample={() => resetWorkspace(sampleNovel)}
-            onLoadSampleOutput={handleLoadSampleOutput}
-            onNovelTextChange={resetWorkspace}
-            sampleState={sampleState}
-          />
-        </div>
-        <div className="workspace-column workspace-column--review">
-          <InsightPanel
-            adaptationMetrics={adaptationMetrics}
-            analysis={analysis}
-            analysisError={analysisError}
-            analysisState={analysisState}
-            repairRounds={repairRounds}
-            screenplay={screenplay}
-            validation={validation}
-            yamlText={yamlText}
-          />
-          <ScenesPanel
-            analysis={analysis}
-            characterById={characterById}
-            generationError={generationError}
-            generationModel={generationModel}
-            generationState={generationState}
-            locationById={locationById}
-            repairRounds={repairRounds}
-            screenplay={screenplay}
-            validation={validation}
-            yamlText={yamlText}
-          />
-          <YamlPanel
-            displayYaml={displayYaml}
-            onExportYaml={handleExportYaml}
-            onValidateYaml={handleValidateYaml}
-            onYamlChange={handleYamlChange}
-            validation={validation}
-            yamlText={yamlText}
-          />
-        </div>
-      </section>
+      <div className="workspace-stage">
+        <AppHeader health={health} healthMessage={healthMessage} />
+        <WorkflowStatus
+          chapterCount={chapterCount}
+          hasValidChapterCount={hasValidChapterCount}
+          validation={validation}
+          yamlText={yamlText}
+        />
+        <section className="workspace-grid">
+          <div className="workspace-column workspace-column--source">
+            <SourcePanel
+              analysisState={analysisState}
+              canAnalyze={canAnalyze}
+              canGenerate={canGenerate}
+              generationState={generationState}
+              isBusy={isBusy}
+              novelText={novelText}
+              onAnalyze={handleAnalyze}
+              onFileChange={handleFileChange}
+              onGenerate={handleGenerate}
+              onLoadSample={() => resetWorkspace(sampleNovel)}
+              onLoadSampleOutput={handleLoadSampleOutput}
+              onNovelTextChange={resetWorkspace}
+              sampleState={sampleState}
+            />
+          </div>
+          <div className="workspace-column workspace-column--review">
+            <InsightPanel
+              adaptationMetrics={adaptationMetrics}
+              analysis={analysis}
+              analysisError={analysisError}
+              analysisState={analysisState}
+              repairRounds={repairRounds}
+              screenplay={screenplay}
+              validation={validation}
+              yamlText={yamlText}
+            />
+            <ScenesPanel
+              analysis={analysis}
+              characterById={characterById}
+              generationError={generationError}
+              generationModel={generationModel}
+              generationState={generationState}
+              locationById={locationById}
+              repairRounds={repairRounds}
+              screenplay={screenplay}
+              validation={validation}
+              yamlText={yamlText}
+            />
+            <YamlPanel
+              displayYaml={displayYaml}
+              onExportYaml={handleExportYaml}
+              onValidateYaml={handleValidateYaml}
+              onYamlChange={handleYamlChange}
+              validation={validation}
+              yamlText={yamlText}
+            />
+          </div>
+        </section>
+      </div>
     </main>
   )
 }
