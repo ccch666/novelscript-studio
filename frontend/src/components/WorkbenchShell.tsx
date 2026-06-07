@@ -89,12 +89,12 @@ function MetricGrid({
   metrics: Array<{ label: string; value: number | string }>
 }) {
   return (
-    <div className="report-grid">
+    <div className="report-strip">
       {metrics.map((metric) => (
-        <article key={metric.label}>
+        <div className="report-item" key={metric.label}>
           <span>{metric.label}</span>
           <strong>{metric.value}</strong>
-        </article>
+        </div>
       ))}
     </div>
   )
@@ -108,11 +108,11 @@ function CharacterGrid({ screenplay }: { screenplay: ScreenplayDocument | null }
   return (
     <div className="character-list">
       {screenplay.characters.map((character) => (
-        <article key={character.id}>
+        <div className="character-row" key={character.id}>
           <span>{character.id}</span>
           <strong>{character.name}</strong>
           <small>{character.role ?? 'unknown'}</small>
-        </article>
+        </div>
       ))}
     </div>
   )
@@ -195,12 +195,15 @@ export function WorkflowStatus({
 
   return (
     <section className="workflow-strip" aria-label="工作流状态">
+      <div className="workflow-rail" aria-hidden="true" />
       {steps.map((step, index) => (
-        <article className={workflowClass(step.done, step.warn)} key={step.label}>
+        <div className={workflowClass(step.done, step.warn)} key={step.label}>
           <small>{String(index + 1).padStart(2, '0')}</small>
-          <span>{step.label}</span>
-          <strong>{step.value}</strong>
-        </article>
+          <div>
+            <span>{step.label}</span>
+            <strong>{step.value}</strong>
+          </div>
+        </div>
       ))}
     </section>
   )
@@ -408,7 +411,7 @@ export function ScenesPanel({
               .join('、')
 
             return (
-              <article className="scene-card" key={scene.id}>
+              <article className="scene-row" key={scene.id}>
                 <div className="scene-card__head">
                   <span>{scene.id}</span>
                   <strong>{scene.title}</strong>
@@ -430,7 +433,7 @@ export function ScenesPanel({
         </div>
       ) : (
         <div className="scene-list">
-          <article>
+          <div className="scene-row">
             <span>Scene 001</span>
             <strong>
               {yamlText
@@ -439,8 +442,8 @@ export function ScenesPanel({
                   ? '可以调用 DeepSeek 生成场景'
                   : '需先通过 3 章校验'}
             </strong>
-          </article>
-          <article>
+          </div>
+          <div className="scene-row">
             <span>Schema</span>
             <strong>
               {validation?.passed
@@ -449,7 +452,7 @@ export function ScenesPanel({
                   ? '校验失败，已显示错误'
                   : '生成后会自动校验并尝试修复'}
             </strong>
-          </article>
+          </div>
         </div>
       )}
       {generationState === 'error' && (
