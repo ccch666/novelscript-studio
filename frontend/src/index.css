@@ -1,27 +1,29 @@
 :root {
-  --accent: #0071e3;
-  --accent-strong: #005bb8;
-  --bg: #f5f5f7;
-  --border: rgba(29, 29, 31, 0.1);
-  --border-strong: rgba(29, 29, 31, 0.18);
-  --code-bg: rgba(255, 255, 255, 0.7);
+  --accent: #2daa5f;
+  --accent-strong: #208248;
+  --app-bg: #f0f1ed;
+  --bg: #121315;
+  --border: rgba(24, 25, 27, 0.12);
+  --border-strong: rgba(24, 25, 27, 0.18);
+  --code-bg: rgba(255, 255, 255, 0.08);
   --danger: #d70015;
   --danger-soft: #fff2f2;
-  --muted: #6e6e73;
-  --panel: rgba(255, 255, 255, 0.86);
+  --muted: #696d6b;
+  --panel: rgba(255, 255, 255, 0.94);
   --panel-solid: #ffffff;
   --radius-md: 8px;
   --radius-pill: 999px;
   --radius-sm: 6px;
   --sans: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', system-ui, sans-serif;
-  --shadow: 0 18px 48px rgba(29, 29, 31, 0.08);
-  --shadow-soft: 0 8px 24px rgba(29, 29, 31, 0.06);
-  --success: #248a3d;
-  --success-soft: #effaf2;
-  --surface: #fbfbfd;
-  --surface-strong: #f1f2f4;
-  --text: #3a3a3c;
-  --text-strong: #1d1d1f;
+  --shadow: 0 18px 40px rgba(24, 25, 27, 0.08);
+  --shadow-soft: 0 8px 22px rgba(24, 25, 27, 0.06);
+  --success: #2daa5f;
+  --success-soft: #edf8ef;
+  --surface: #f6f7f3;
+  --surface-strong: #e7e9e3;
+  --text: #3b403d;
+  --text-inverse: #f5f5f7;
+  --text-strong: #18191b;
   --warning: #b46900;
   --warning-soft: #fff7e8;
   --mono: 'SF Mono', ui-monospace, Menlo, Consolas, monospace;
@@ -46,8 +48,7 @@
 }
 
 body {
-  background:
-    linear-gradient(180deg, #ffffff 0%, #f7f7f9 42%, #eef1f5 100%);
+  background: var(--bg);
   margin: 0;
   min-width: 320px;
 }
@@ -82,15 +83,15 @@ p {
 
 code {
   background: var(--code-bg);
-  border: 1px solid rgba(29, 29, 31, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 6px;
-  color: var(--text-strong);
+  color: rgba(245, 245, 247, 0.82);
   font: 13px/1.35 var(--mono);
   padding: 4px 8px;
 }
 
 ::selection {
-  background: rgba(0, 113, 227, 0.18);
+  background: rgba(45, 170, 95, 0.22);
 }
 
 @media (max-width: 1024px) {

@@ -52,7 +52,7 @@ function Panel({
         <p className="panel-kicker">{kicker}</p>
         <h2>{title}</h2>
       </div>
-      {children}
+      <div className="panel-body">{children}</div>
     </section>
   )
 }
@@ -127,17 +127,32 @@ export function AppHeader({
 }) {
   return (
     <header className="app-header">
-      <div className="brand-lockup">
-        <p className="eyebrow">AI 小说剧本改编工作台</p>
-        <h1>NovelScript Studio</h1>
-        <p className="header-copy">把三章以上小说改编成可校验、可编辑、可导出的 YAML 剧本初稿。</p>
-      </div>
-      <div className="header-status">
-        <div className={`status-pill status-pill--${health}`}>
-          <span className="status-dot" aria-hidden="true" />
-          <span>{healthLabel(health)}</span>
+      <div className="app-header__bar">
+        <div className="window-controls" aria-hidden="true">
+          <span />
+          <span />
+          <span />
         </div>
-        <code>{healthMessage}</code>
+        <div className="brand-mark" aria-hidden="true">NS</div>
+        <div className="brand-lockup">
+          <p className="eyebrow">题目三 · AI 小说转剧本工具</p>
+          <h1>NovelScript Studio</h1>
+        </div>
+        <div className="header-status">
+          <div className={`status-pill status-pill--${health}`}>
+            <span className="status-dot" aria-hidden="true" />
+            <span>{healthLabel(health)}</span>
+          </div>
+          <code>{healthMessage}</code>
+        </div>
+      </div>
+      <div className="app-header__lower">
+        <p className="header-copy">把三章以上小说改编成可校验、可编辑、可导出的 YAML 剧本初稿。</p>
+        <div className="header-meta" aria-label="核心能力">
+          <span>3+ 章节门槛</span>
+          <span>Schema 校验</span>
+          <span>在线编辑导出</span>
+        </div>
       </div>
     </header>
   )
@@ -180,8 +195,9 @@ export function WorkflowStatus({
 
   return (
     <section className="workflow-strip" aria-label="工作流状态">
-      {steps.map((step) => (
+      {steps.map((step, index) => (
         <article className={workflowClass(step.done, step.warn)} key={step.label}>
+          <small>{String(index + 1).padStart(2, '0')}</small>
           <span>{step.label}</span>
           <strong>{step.value}</strong>
         </article>
@@ -227,6 +243,7 @@ export function SourcePanel({
     <Panel className="panel--input" kicker="输入" title="小说文本">
       <div className="quick-lane" aria-label="评审快速入口">
         <div>
+          <span className="quick-lane__label">Demo Path</span>
           <strong>评审快速入口</strong>
           <span>直接查看完整 YAML、场景卡片和 Schema 结果。</span>
         </div>
@@ -234,7 +251,15 @@ export function SourcePanel({
           {sampleState === 'loading' ? '加载中' : '加载示例 YAML'}
         </button>
       </div>
+      <div className="source-rule">
+        <span>输入规则</span>
+        <strong>至少 3 个章节，生成后自动校验 YAML Schema。</strong>
+      </div>
       <div className="editor-shell">
+        <div className="editor-toolbar">
+          <span>manuscript.txt</span>
+          <span>{novelText.trim().length} chars</span>
+        </div>
         <textarea
           aria-label="小说文本输入"
           value={novelText}
@@ -247,19 +272,23 @@ export function SourcePanel({
         </div>
       </div>
       <div className="panel-actions">
-        <label className="file-button">
-          上传 TXT
-          <input type="file" accept=".txt,text/plain" onChange={handleFileInput} />
-        </label>
-        <button type="button" disabled={isBusy} onClick={onLoadSample}>
-          加载示例小说
-        </button>
-        <button type="button" className="primary-action" disabled={!canAnalyze} onClick={onAnalyze}>
-          {analysisState === 'loading' ? '分析中' : '分析章节'}
-        </button>
-        <button type="button" className="primary-action" disabled={!canGenerate} onClick={onGenerate}>
-          {generationState === 'loading' ? '生成中' : '生成剧本'}
-        </button>
+        <div className="panel-actions__secondary">
+          <label className="file-button">
+            上传 TXT
+            <input type="file" accept=".txt,text/plain" onChange={handleFileInput} />
+          </label>
+          <button type="button" disabled={isBusy} onClick={onLoadSample}>
+            加载示例小说
+          </button>
+        </div>
+        <div className="panel-actions__primary">
+          <button type="button" className="primary-action" disabled={!canAnalyze} onClick={onAnalyze}>
+            {analysisState === 'loading' ? '分析中' : '分析章节'}
+          </button>
+          <button type="button" className="primary-action primary-action--strong" disabled={!canGenerate} onClick={onGenerate}>
+            {generationState === 'loading' ? '生成中' : '生成剧本'}
+          </button>
+        </div>
       </div>
     </Panel>
   )
@@ -369,7 +398,7 @@ export function ScenesPanel({
   return (
     <Panel className="panel--scenes" kicker="剧本" title="场景卡片">
       {scenes.length > 0 ? (
-        <div className="scene-list">
+        <div className="scene-list scene-list--timeline">
           {scenes.map((scene) => {
             const locationName = scene.location_id
               ? locationById[scene.location_id]?.name
@@ -476,13 +505,19 @@ export function YamlPanel({
           </span>
         )}
       </div>
-      <textarea
-        className="yaml-editor"
-        aria-label="YAML 剧本编辑器"
-        disabled={!yamlText}
-        value={displayYaml}
-        onChange={(event) => onYamlChange(event.target.value)}
-      />
+      <div className="yaml-editor-shell">
+        <div className="yaml-editor-top">
+          <span>screenplay.yaml</span>
+          <span>{yamlText ? 'editable' : 'preview'}</span>
+        </div>
+        <textarea
+          className="yaml-editor"
+          aria-label="YAML 剧本编辑器"
+          disabled={!yamlText}
+          value={displayYaml}
+          onChange={(event) => onYamlChange(event.target.value)}
+        />
+      </div>
       {validation && !validation.passed && (
         <div className="validation-list">
           {validation.errors.slice(0, 6).map((error) => (
