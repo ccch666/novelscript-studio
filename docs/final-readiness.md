@@ -110,7 +110,7 @@ POST /api/scripts/validate
 ## 提交前剩余事项
 
 - 已录制 demo 视频。
-- Demo 视频已通过公开 GitHub Release 附件提供。
-- 已将 demo 视频链接替换到 README 顶部。
+- Demo 视频已通过 GitHub Pages 播放页提供，可直接在线观看。
+- 已将 demo 视频在线播放链接替换到 README 顶部。
 - 在报名地址填写最终仓库和 demo 视频信息。
 - GitHub 仓库已改为 Public。

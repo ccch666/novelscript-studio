@@ -1,6 +1,6 @@
 # NovelScript Studio
 
-Demo 视频链接：[NovelScript Studio Demo Video](https://github.com/ccch666/novelscript-studio/releases/download/demo-video-2026-06-07/novelscript-studio-demo.mov)
+Demo 视频链接：[NovelScript Studio 在线 Demo](https://ccch666.github.io/novelscript-studio/demo/)（备用 MP4 直链：[novelscript-studio-demo.mp4](https://ccch666.github.io/novelscript-studio/demo/novelscript-studio-demo.mp4)）
 
 AI 小说剧本改编工作台。项目面向七牛云 x XEngineer 暑期实训营第三批次题目三：AI 小说转剧本工具。
 
