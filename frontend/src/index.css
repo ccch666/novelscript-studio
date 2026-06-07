@@ -1,39 +1,143 @@
-:root {
-  --accent: #2daa5f;
-  --accent-strong: #208248;
-  --app-bg: #f0f1ed;
-  --bg: #121315;
-  --border: rgba(24, 25, 27, 0.12);
-  --border-strong: rgba(24, 25, 27, 0.18);
-  --code-bg: rgba(255, 255, 255, 0.08);
-  --danger: #d70015;
-  --danger-soft: #fff2f2;
-  --muted: #696d6b;
-  --panel: rgba(255, 255, 255, 0.94);
-  --panel-solid: #ffffff;
-  --radius-md: 8px;
-  --radius-pill: 999px;
-  --radius-sm: 6px;
-  --sans: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', system-ui, sans-serif;
-  --shadow: 0 18px 40px rgba(24, 25, 27, 0.08);
-  --shadow-soft: 0 8px 22px rgba(24, 25, 27, 0.06);
-  --success: #2daa5f;
-  --success-soft: #edf8ef;
-  --surface: #f6f7f3;
-  --surface-strong: #e7e9e3;
-  --text: #3b403d;
-  --text-inverse: #f5f5f7;
-  --text-strong: #18191b;
-  --warning: #b46900;
-  --warning-soft: #fff7e8;
-  --mono: 'SF Mono', ui-monospace, Menlo, Consolas, monospace;
+/* ============================================================
+ * NovelScript Studio · 设计 tokens
+ * - 用语义化变量定义高端编辑感视觉系统
+ * - 颜色: 低饱和暖墨色 + 翡翠点缀，避免廉价饱和
+ * - 字体: SF 系统栈优先，等宽用于数据/编号
+ * ============================================================ */
 
+:root {
+  /* —— 颜色：背景层 —— */
+  --ink-1000: #0b0c0e;          /* 主背景：深墨 */
+  --ink-900: #111214;           /* 卡片深底：输入面板 */
+  --ink-800: #16181b;           /* 顶部条 */
+  --ink-700: #1d2024;           /* 悬浮表面 */
+  --ink-100: #f6f5f1;           /* 主卡片：暖白宣纸 */
+  --ink-50: #faf9f6;            /* 强亮表面 */
+  --ink-0: #ffffff;             /* 纯白 */
+
+  /* —— 颜色：文字 —— */
+  --text-strong: #14161a;
+  --text: #2a2e34;
+  --text-mute: #5a5f66;
+  --text-faint: #8a8f96;
+  --text-inverse: #f3efe8;
+  --text-inverse-mute: rgba(243, 239, 232, 0.62);
+  --text-inverse-faint: rgba(243, 239, 232, 0.42);
+
+  /* —— 颜色：语义 —— */
+  --accent: #1f7a4d;            /* 翡翠 · 输入/分析 */
+  --accent-strong: #16603c;
+  --accent-soft: #e7f2ec;
+  --accent-glow: rgba(31, 122, 77, 0.22);
+
+  --indigo: #3949c2;            /* 靛蓝 · 剧本场景 */
+  --indigo-strong: #2c39a3;
+  --indigo-soft: #e7eaf9;
+  --indigo-glow: rgba(57, 73, 194, 0.22);
+
+  --amber: #c47600;             /* 琥珀 · 校验/警告 */
+  --amber-strong: #945700;
+  --amber-soft: #fdf2dc;
+  --amber-glow: rgba(196, 118, 0, 0.22);
+
+  --rose: #c12a55;              /* 玫红 · 错误/失败 */
+  --rose-strong: #94183d;
+  --rose-soft: #fce0e8;
+  --rose-glow: rgba(193, 42, 85, 0.22);
+
+  --teal: #0f7a8a;              /* 青 · 导出/元数据 */
+  --teal-strong: #0a5a66;
+  --teal-soft: #def1f4;
+  --teal-glow: rgba(15, 122, 138, 0.22);
+
+  --success: var(--accent);
+  --warning: var(--amber);
+  --warning-soft: var(--amber-soft);
+  --danger: var(--rose);
+  --danger-soft: var(--rose-soft);
+
+  /* —— 颜色：分割/描边 —— */
+  --line: rgba(20, 22, 26, 0.08);
+  --line-strong: rgba(20, 22, 26, 0.16);
+  --line-inverse: rgba(243, 239, 232, 0.08);
+  --line-inverse-strong: rgba(243, 239, 232, 0.16);
+
+  /* —— 渐变：外壳背景 —— */
+  --grad-shell:
+    radial-gradient(1200px 600px at 88% -10%, var(--accent-glow), transparent 60%),
+    radial-gradient(900px 500px at -10% 110%, var(--rose-glow), transparent 60%),
+    radial-gradient(700px 500px at 50% 50%, var(--indigo-glow), transparent 70%),
+    linear-gradient(180deg, #0b0c0e 0%, #06070a 100%);
+
+  /* —— 字体 —— */
+  --sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", "PingFang SC",
+    "Segoe UI", system-ui, sans-serif;
+  --display: "SF Pro Display", -apple-system, BlinkMacSystemFont,
+    "PingFang SC", system-ui, sans-serif;
+  --mono: "SF Mono", ui-monospace, "JetBrains Mono", Menlo, Consolas, monospace;
+
+  /* —— 半径 —— */
+  --r-xs: 4px;
+  --r-sm: 6px;
+  --r-md: 10px;
+  --r-lg: 14px;
+  --r-xl: 20px;
+  --r-pill: 999px;
+
+  /* —— 阴影：多层柔和投影 —— */
+  --shadow-xs: 0 1px 2px rgba(20, 22, 26, 0.05);
+  --shadow-sm: 0 4px 14px rgba(20, 22, 26, 0.06),
+    0 1px 2px rgba(20, 22, 26, 0.04);
+  --shadow-md: 0 12px 32px rgba(20, 22, 26, 0.10),
+    0 2px 6px rgba(20, 22, 26, 0.05);
+  --shadow-lg: 0 24px 60px rgba(20, 22, 26, 0.16),
+    0 4px 12px rgba(20, 22, 26, 0.06);
+  --shadow-xl: 0 40px 100px rgba(8, 10, 12, 0.50),
+    0 8px 24px rgba(8, 10, 12, 0.30);
+  --shadow-inner: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  --shadow-glow: 0 0 0 1px var(--accent-glow),
+    0 8px 24px rgba(31, 122, 77, 0.18);
+
+  /* —— 玻璃表面（暗色） —— */
+  --glass-bg: linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.015));
+  --glass-border: rgba(255, 255, 255, 0.08);
+  --glass-border-strong: rgba(255, 255, 255, 0.14);
+  --glass-text: rgba(243, 239, 232, 0.92);
+  --glass-mute: rgba(243, 239, 232, 0.62);
+
+  /* —— 渐变：高级按钮 sheen —— */
+  --grad-sheen: linear-gradient(
+    120deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.18) 45%,
+    rgba(255, 255, 255, 0.32) 50%,
+    rgba(255, 255, 255, 0.18) 55%,
+    transparent 100%
+  );
+  --grad-emerald: linear-gradient(180deg, #2a9c69 0%, #1a6a44 100%);
+  --grad-indigo: linear-gradient(180deg, #4a5cd6 0%, #2c39a3 100%);
+  --grad-amber: linear-gradient(180deg, #d68800 0%, #945700 100%);
+  --grad-teal: linear-gradient(180deg, #14919f 0%, #0a5a66 100%);
+  --grad-rose: linear-gradient(180deg, #d6345e 0%, #94183d 100%);
+
+  /* —— 渐变：文字 gradient text —— */
+  --grad-text-warm: linear-gradient(180deg, #fff7e6 0%, #f3efe8 60%, #d6cfbe 100%);
+  --grad-text-cool: linear-gradient(180deg, #f3efe8 0%, rgba(243, 239, 232, 0.50) 100%);
+
+  /* —— 动效 —— */
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --dur-fast: 140ms;
+  --dur-base: 220ms;
+  --dur-slow: 380ms;
+
+  /* —— 全局 —— */
   color: var(--text);
-  background: var(--bg);
-  color-scheme: light;
-  font: 16px/1.5 var(--sans);
+  background: var(--ink-1000);
+  color-scheme: dark;
+  font: 16px/1.55 var(--sans);
   font-synthesis: none;
-  letter-spacing: 0;
+  letter-spacing: -0.005em;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -43,14 +147,16 @@
   box-sizing: border-box;
 }
 
+html,
+body,
 #root {
+  margin: 0;
   min-height: 100svh;
 }
 
 body {
-  background: var(--bg);
-  margin: 0;
-  min-width: 320px;
+  background: var(--ink-1000);
+  color: var(--text-inverse);
 }
 
 button,
@@ -60,16 +166,18 @@ textarea {
 }
 
 h1,
-h2 {
-  color: var(--text-strong);
-  font-family: var(--sans);
-  font-weight: 750;
-  letter-spacing: 0;
+h2,
+h3 {
+  color: var(--text-inverse);
+  font-family: var(--display);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  margin: 0;
 }
 
 h1 {
-  font-size: 36px;
-  line-height: 1.05;
+  font-size: 34px;
+  line-height: 1.08;
 }
 
 h2 {
@@ -78,20 +186,46 @@ h2 {
 }
 
 p {
+  color: var(--text-inverse-mute);
   margin: 0;
 }
 
 code {
-  background: var(--code-bg);
+  background: rgba(255, 255, 255, 0.06);
   border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 6px;
-  color: rgba(245, 245, 247, 0.82);
-  font: 13px/1.35 var(--mono);
+  border-radius: var(--r-xs);
+  color: var(--text-inverse);
+  font: 12.5px/1.4 var(--mono);
   padding: 4px 8px;
+  letter-spacing: 0;
 }
 
 ::selection {
-  background: rgba(45, 170, 95, 0.22);
+  background: var(--accent-glow);
+  color: var(--text-strong);
+}
+
+/* —— 全局滚动条：低调精致 —— */
+::-webkit-scrollbar {
+  height: 10px;
+  width: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(243, 239, 232, 0.10);
+  border: 2px solid transparent;
+  background-clip: padding-box;
+  border-radius: var(--r-pill);
+  transition: background var(--dur-base) var(--ease-out);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(243, 239, 232, 0.20);
+  background-clip: padding-box;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
 }
 
 @media (max-width: 1024px) {
@@ -100,10 +234,20 @@ code {
   }
 
   h1 {
-    font-size: 30px;
+    font-size: 28px;
   }
 
   h2 {
     font-size: 18px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 1ms !important;
+    scroll-behavior: auto !important;
+    transition-duration: 1ms !important;
   }
 }
