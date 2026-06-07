@@ -1,14 +1,14 @@
 # 最终自测与公开准备清单
 
-检查日期：2026-06-06
+检查日期：2026-06-07
 
 ## 当前状态
 
 - GitHub 仓库：https://github.com/ccch666/novelscript-studio
 - 默认分支：`main`
-- 当前仓库权限：Private
-- 规则提醒：2026-06-07 23:59 前可保持私有，2026-06-08 00:00 起需要公开。
-- Demo 视频：待录制并替换 README 顶部链接。
+- 当前仓库权限：Public
+- 规则提醒：仓库已公开，符合 2026-06-08 00:00 起公开要求。
+- Demo 视频：已上传到 GitHub Release，并替换 README 顶部链接。
 
 ## 本地自测
 
@@ -109,8 +109,8 @@ POST /api/scripts/validate
 
 ## 提交前剩余事项
 
-- 录制 demo 视频。
-- 将 demo 视频权限按规则设置：2026-06-07 23:59 前可私有，2026-06-08 00:00 起需公开。
-- 将 demo 视频链接替换到 README 顶部。
+- 已录制 demo 视频。
+- Demo 视频已通过公开 GitHub Release 附件提供。
+- 已将 demo 视频链接替换到 README 顶部。
 - 在报名地址填写最终仓库和 demo 视频信息。
-- 2026-06-08 00:00 后将 GitHub 仓库改为 Public。
+- GitHub 仓库已改为 Public。
